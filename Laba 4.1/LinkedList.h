@@ -9,6 +9,7 @@ class LinkedList {
 		class Node
 		{
 		public:
+			friend LinkedList<T>;
 
 			Node(T data, Node * next = nullptr, Node * prev = nullptr) {
 				this->data = data;
@@ -32,13 +33,41 @@ class LinkedList {
 		
 		Node * head;
 		Node * tail;
+		class ListIterator : public Iterator<T>
+		{
+		public:
+			ListIterator(Node* head)
+			{
+				current = head;
+			};
+
+		private:
+			T next() override;
+			bool has_next() override;
+			Node* current;
+		};
 		
-		
-//private:
-//	void add_first(T newElem);
-//	void reset_list();
-//	size_t size;
-	/*bool equals(LinkedList<T> * list);*/
+		Iterator<T>* create_list_iterator() const;
+		template <class T>
+		Iterator<T>* LinkedList<T>::create_list_iterator() const
+		{
+			if (this == nullptr && this->head == nullptr) throw std::exception("Does not exist");
+			return new ListIterator(this->head);
+		}
+
+
+		friend std::ostream& operator<<(std::ostream& os, const LinkedList<T>& linked_list) {
+			if (linked_list.size == 0)
+				return os << "[nullptr]";
+			auto * list = linked_list.create_list_iterator();
+			os << "[nullptr] <- ";
+			while (list->has_next()) {
+				os << "[" << list->next() << "] <- ";
+			}
+			os << "[nullptr]" << std::endl;
+			return os;
+		};
+
 
 	
 public:
@@ -60,6 +89,9 @@ public:
 		void reset_list();
 		size_t size;
 		bool isEmpty();
+		void swap(Node*, Node*);
+		void sortPart(int fromIndex, int toIndex, bool(*comp)(T, T));
+		void sort(bool (*comp)(T, T));
 		
 		friend std::ostream& operator<<(std::ostream& Out, const LinkedList<T>& list) {
 		
