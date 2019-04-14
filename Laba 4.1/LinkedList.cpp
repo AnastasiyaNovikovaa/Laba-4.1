@@ -4,7 +4,24 @@
 #include <iostream>
  
 using namespace std;
-    template <class  T>
+template <class T>
+T LinkedList<T>::ListIterator::next()
+{
+	if (!current) return T();
+	const T data = current->data;
+	current = current->next;
+	return data;
+}
+
+template <class T>
+bool LinkedList<T>::ListIterator::has_next()
+{
+	return (current != nullptr);
+}
+
+
+   
+template <class  T>
 	void LinkedList<T>::reset_list()
 	{
 		head = nullptr;
@@ -159,7 +176,7 @@ using namespace std;
 	void LinkedList<T>::insert(size_t index, T newElem)
 	{
 		if (index > size) {
-			throw std::out_of_range("Index is greater than size of list. Sorry :Ò ");
+			throw std::out_of_range("Index is greater than size of list. Sorry :—Å ");
 		}
 		else {
 			if (size == 0 && index == 0) // if first element and list is empty
@@ -268,4 +285,40 @@ using namespace std;
 			return true;
 		else
 			return false;
+	}
+
+	template <class T>
+	void LinkedList<T>::sortPart(int fromIndex, int toIndex, bool(*comp)(T, T))
+	{
+		if (fromIndex < toIndex)
+		{
+			const T last = this->at(toIndex);
+			int i = fromIndex - 1;
+			for (int j = fromIndex; j < toIndex; j++)
+			{
+				if (comp(this->at(j), last))
+				{
+					i++;
+					swap(this->at_node(i), this->at_node(j));
+				}
+			}
+			swap(this->at_node(toIndex), this->at_node(i + 1));
+			const int middleIndex = i + 1;
+			sortPart(fromIndex, middleIndex - 1, comp);
+			sortPart(middleIndex + 1, toIndex, comp);
+		}
+	}
+
+	template <class T>
+	void LinkedList<T>::sort(bool(*comp)(T, T))
+	{
+		const auto toIndex = size - 1;
+		sortPart(0, toIndex, comp);
+	}
+	template <class T>
+	void LinkedList<T>::swap(Node* first, Node* second)
+	{
+		auto temp = first->data;
+		first->data = second->data;
+		second->data = temp;
 	}
