@@ -1,5 +1,6 @@
 #pragma once
 #include <stdexcept>
+#include "Iterator.h"
 
 using namespace std;
 template <class  T>
@@ -48,15 +49,11 @@ class LinkedList {
 		};
 		
 		Iterator<T>* create_list_iterator() const;
-		template <class T>
-		Iterator<T>* LinkedList<T>::create_list_iterator() const
-		{
-			if (this == nullptr && this->head == nullptr) throw std::exception("Does not exist");
-			return new ListIterator(this->head);
-		}
+		
+		
 
 
-		friend std::ostream& operator<<(std::ostream& os, const LinkedList<T>& linked_list) {
+		/*friend std::ostream& operator<<(std::ostream& os, const LinkedList<T>& linked_list) {
 			if (linked_list.size == 0)
 				return os << "[nullptr]";
 			auto * list = linked_list.create_list_iterator();
@@ -66,7 +63,7 @@ class LinkedList {
 			}
 			os << "[nullptr]" << std::endl;
 			return os;
-		};
+		};*/
 
 
 	
