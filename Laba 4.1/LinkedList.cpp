@@ -19,7 +19,12 @@ bool LinkedList<T>::ListIterator::has_next()
 	return (current != nullptr);
 }
 
-
+template <class T>
+Iterator<T>* LinkedList<T>::create_list_iterator() const
+{
+	if (this == nullptr && this->head == nullptr) throw std::exception("Does not exist");
+	return new ListIterator(this->head);
+}
    
 template <class  T>
 	void LinkedList<T>::reset_list()
@@ -315,6 +320,7 @@ template <class  T>
 		const auto toIndex = size - 1;
 		sortPart(0, toIndex, comp);
 	}
+	
 	template <class T>
 	void LinkedList<T>::swap(Node* first, Node* second)
 	{
