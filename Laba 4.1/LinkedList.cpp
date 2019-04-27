@@ -4,327 +4,394 @@
 #include <iostream>
  
 using namespace std;
-template <class T>
-T LinkedList<T>::ListIterator::next()
+using namespace std;
+
+template<typename T>
+size_t List<T>::counting_average_frequancy(Node* first, Node*last)//подсчитываем среднее значение частоты
 {
-	if (!current) return T();
-	const T data = current->data;
-	current = current->next;
-	return data;
+	Node* cur =first;
+	size_t sum = 0;
+	while (cur != last->next)
+	{
+
+		sum += cur->freq;
+		cur = cur->next;
+	}
+	return round(sum/2.0);
 }
 
-template <class T>
-bool LinkedList<T>::ListIterator::has_next()
+template<typename T>
+void List<T>::set_code(Node *first, Node *last, char sign)
 {
-	return (current != nullptr);
+	Node* cur = first;
+	while (cur != last)
+	{
+		cur->code += sign;
+		cur = cur->prev;
+	}
 }
 
-template <class T>
-Iterator<T>* LinkedList<T>::create_list_iterator() const
+template<typename T>
+List<T>::List()
 {
-	if (this == nullptr && this->head == nullptr) throw std::exception("Does not exist");
-	return new ListIterator(this->head);
+	head = nullptr;
+	tail = nullptr;
+	size = 0;
 }
-   
-template <class  T>
-	void LinkedList<T>::reset_list()
+
+template<typename T>
+List<T>::~List()
+{
+
+	clear();
+}
+
+template<typename T>
+size_t List<T>::get_size() const
+{
+	return size;
+}
+template<typename T>
+void List<T>::push_back(T newElem, size_t freq)
+{
+	if (size == 0) {
+		head = new Node(newElem, freq);
+		tail = head;
+	}
+	else {
+
+		tail->next = new Node(newElem, freq);
+		tail->next->prev = tail;
+		tail = tail->next;
+	}
+	size++;
+
+}
+template<typename T>
+void List<T>::push_front(T newElem, size_t freq)
+{
+	if (size == 0)
+		add_first(newElem, freq);
+	else
+	{
+		
+		head->prev = new Node(newElem, freq, head);
+		head = head->prev;
+		
+	}
+
+	size++;
+}
+template<typename T>
+void List<T>::pop_back()
+{
+
+	if (size == 0) return;
+
+	if (size == 1) {
+		head = nullptr;
+		tail = nullptr;
+		delete head;
+		delete tail;
+
+	}
+	else {
+		Node * cur = head;
+		do
+		{
+			cur = cur->next;
+		} while (cur->next != tail);
+		cur->next = nullptr;
+		cur->next->prev = nullptr;
+		delete tail;
+		tail = cur;
+
+	}
+	size--;
+
+}
+template<typename T>
+void List<T>::pop_front()
+{
+	if (size == 0) return;
+	if (size == 1)
 	{
 		head = nullptr;
 		tail = nullptr;
 		size = 0;
+		return;
 	}
-
-	template <class  T>
-	LinkedList<T>::LinkedList()
+	else
 	{
-		reset_list();
+		Node *cur = head->next;
+		head->next = nullptr;
+		cur->prev = nullptr;
+		delete head;
+		head = cur;
 	}
-
-	template <class  T>
-	LinkedList<T>::~LinkedList()    // destructor
+	size--;
+}
+template<typename T>
+void List<T>::print() //печать кода и его частоты
+{
+	setlocale(LC_ALL, "Russian");
+	Node * cur = tail;
+	while (cur != nullptr)
 	{
-		clear();
-	}
-
-
-	template <class  T>
-	void LinkedList<T>::add_first(T newElem)
-	{
-		head = new Node(newElem);
-		tail = head;
-		size = 1;
-	}
-
-	template <class  T>
-	size_t LinkedList<T>::get_size() const
-	{
-		return size;
-	}
-
-	template <class  T>
-	void LinkedList<T>::clear()
-	{
-		if (size == 0) return;
-
-		if (size == 1) {
-			reset_list();
-			delete head;
-			delete tail;
-		}
-		else {
-			while (head != nullptr) {
-				pop_front();
-			}
-			reset_list();
-			delete head;
-			delete tail;
-		}
-	}
-
-	template <class  T>
-	void LinkedList<T>::set(size_t index, T newElem) const
-	{
-		if (index >= size) {
-			throw std::out_of_range("Index is greater than list size");
-		}
-		else {
-			size_t counter = 0;
-			Node * current = head;
-			while (counter != index) {
-				current = current->next;
-				counter++;
-			}
-			current->data = newElem;
-		}
-	}
-
-	/*template <class  T>
-	bool LinkedList<T>::isEmpty() const
-	{
-		return size == 0;
-	}*/
-
-	template <class  T>
-	void LinkedList<T>::print_to_console()
-	{
-		Node * current = head;
-		while (current != NULL) {
-			cout << current->data << " ";
-			current = current->next;
-
-		}
-	}
-
-	template <class  T>
-	void LinkedList<T>::push_back(T newElem)
-	{
-		if (size == 0) {
-			add_first(newElem);
-		}
-		else {
-			tail->next = new Node(newElem, nullptr, tail);
-			tail = tail->next;
-			size++;
-		}
-	}
-
-	template <class  T>
-	void LinkedList<T>::push_front(T newElem)
-	{
-		if (size == 0) {
-			add_first(newElem);
-		}
-		else {
-			head = new Node(newElem, head, nullptr);
-			size++;
-		}
-	}
-
-	template <class  T>
-	void LinkedList<T>::pop_back()
-	{
-		if (size == 0) return;
-
-		if (size == 1) {
-			reset_list();
-			delete head;
-			delete tail;
-		}
-		else {
-			Node * current = tail->prev;
-			current->next = nullptr;
-			delete tail;
-			tail = current;
-			size--;
-		}
-	}
-
-	template <class  T>
-	void LinkedList<T>::pop_front()
-	{
-		if (size == 0) return;
-
-		if (size == 1) {
-			reset_list();
-			delete head;
-			delete tail;
-		}
-		else {
-			Node * current = head->next;
-			delete head;
-			head = current;
-			size--;
-		}
-	}
-
-	template <class  T>
-	void LinkedList<T>::insert(size_t index, T newElem)
-	{
-		if (index > size) {
-			throw std::out_of_range("Index is greater than size of list. Sorry :с ");
-		}
-		else {
-			if (size == 0 && index == 0) // if first element and list is empty
-			{
-				add_first(newElem);
-				return;
-			}
-			if (index == 0)              //if first element
-			{
-				push_front(newElem);
-				return;
-			}
-			if (index == size)          // if tail element
-			{
-				push_back(newElem);
-				return;
-			}
-			size_t counter = 0;
-			Node* current = head;
-			Node * prev = nullptr;
-			while (counter != index) {
-				prev = current;
-				current = current->next;
-				counter++;
-			}
-			current = new Node(newElem, current, prev);
-			if (prev != nullptr) {
-				prev->next = current;
-			}
-			else
-			{
-				head = current;
-			}
-			size++;
-		}
-	}
-
-	template <class  T>
-	T LinkedList<T>::at(size_t index) const
-	{
-		if (index >= size) {
-			throw std::out_of_range("Index is greater than size of list ");
-		}
-		else {
-			size_t counter = 0;
-			Node * current = head;
-			while (counter != index) {
-				current = current->next;
-				counter++;
-			}
-			return current->data;
-		}
-	}
-
-	template <class  T>
-	void LinkedList<T>::remove(size_t index)
-	{
-		if (index > size) {
-			throw std::out_of_range("Index is greater than size of list, very very bad");
-		}
-		else {
-			if (size == 0)
-			{
-				return;
-			}
-			if (index == 0)
-			{
-				pop_front();
-				return;
-			}
-			if (index == size - 1)
-			{
-				pop_back();
-				return;
-			}
-			size_t counter = 0;
-			Node * current = head;
-			while (counter != index) {
-				current = current->next;
-				counter++;
-			}
-			current->prev->next = current->next;
-			current->next->prev = current->prev;
-			delete current;
-			size--;
-		}
-	}
-
-	template <class  T>
-	bool LinkedList<T>::equals(LinkedList<T> * list) 
-	{
-			if (size != list->size)
-				return false;
-			for (int i = 0; i < size; i++)
-			{
-				if (at(i) != list->at(i))
-					return false;
-			}
-			return true;
-	}
-
-	template <class  T>
-	bool LinkedList<T>::isEmpty()
-	{
-		if (size == 0)
-			return true;
-		else
-			return false;
-	}
-
-	template <class T>
-	void LinkedList<T>::sortPart(int fromIndex, int toIndex, bool(*comp)(T, T))
-	{
-		if (fromIndex < toIndex)
-		{
-			const T last = this->at(toIndex);
-			int i = fromIndex - 1;
-			for (int j = fromIndex; j < toIndex; j++)
-			{
-				if (comp(this->at(j), last))
-				{
-					i++;
-					swap(this->at_node(i), this->at_node(j));
-				}
-			}
-			swap(this->at_node(toIndex), this->at_node(i + 1));
-			const int middleIndex = i + 1;
-			sortPart(fromIndex, middleIndex - 1, comp);
-			sortPart(middleIndex + 1, toIndex, comp);
-		}
-	}
-
-	template <class T>
-	void LinkedList<T>::sort(bool(*comp)(T, T))
-	{
-		const auto toIndex = size - 1;
-		sortPart(0, toIndex, comp);
+		cout << "символ:"<<cur->data ;
+		cout << " код символа:" << cur->code << " частота:"<< cur-> freq <<'\n';
+		cur = cur->prev;
 	}
 	
-	template <class T>
-	void LinkedList<T>::swap(Node* first, Node* second)
-	{
-		auto temp = first->data;
-		first->data = second->data;
-		second->data = temp;
+}
+template<typename T>
+string List<T>::get_code_list(size_t index)//возврат закодируемых символов
+
+{
+	Node* cur = head;
+	int i = 0;
+	while (i != index) { i++; cur = cur->next; }
+	return cur->code;
+}
+
+template<typename T>
+char List<T>::get_data_list(size_t index)
+{
+	Node* cur = head;
+	int i = 0;
+	while (i != index) { i++; cur = cur->next; }
+	return cur->data;
+}
+template<typename T>
+T List<T>::at(size_t index) const
+{
+	if (index >= size) {
+		throw out_of_range("Index is greater than list size");
 	}
+	else {
+		size_t count = 0;
+		Node * cur = head;
+		while (count != index) {
+			cur = cur->next;
+			count++;
+		}
+		cout << cur->data;
+		return cur->data;
+	}
+}
+template<typename T>
+bool List<T>::isEmpty()
+{
+	if (size == 0)
+		return true;
+	return false;
+}
+
+
+
+
+template<typename T>
+void List<T>::set(size_t index, T newElem)
+{
+
+	if (index >= size) {
+		return;
+	}
+	else {
+		size_t count = 0;
+		Node * cur = head;
+		while (count != index) {
+			cur = cur->next;
+			count++;
+		}
+		cur->data = newElem;
+
+	}
+}
+
+template<typename T>
+void List<T>::clear()
+{
+
+	Node* cur = head;
+	while (cur != nullptr)
+	{
+		Node* next = cur->next;
+		cur = nullptr;
+		delete cur;
+		cur = next;
+	}
+	head = tail = nullptr;
+	size = 0;
+}
+
+
+
+template<typename T>
+void List<T>::Delete(size_t index)
+{
+	if (size == 0 || index > size) throw out_of_range("List is empty");
+
+	Node * cur = head;
+	if (index == 0)
+	{
+		pop_front();
+		return;
+	}
+	size_t i = index;
+	while (i != index - 1)
+	{
+		cur = cur->next;
+		i--;
+	}
+	if (cur->prev != nullptr)
+		cur->prev->next = cur->next;
+	if (cur->next->next != nullptr)
+	{
+		cur->next = cur->next->next;
+		delete cur;
+	}
+	else
+	{
+		cur->next = nullptr;
+		delete cur->next;
+	}
+
+	if (size == 1)
+		head = tail = nullptr;
+
+	size--;
+}
+
+template<typename T>
+void List<T>::insert(T newElem,size_t freq, size_t index)
+{
+	if (index >= size) {
+		throw out_of_range("Index is greater than list size");
+	}
+	else {
+
+		size_t count = 0;
+		Node * cur = head;
+		if (index == 0)
+		{
+			push_front(newElem, freq);
+		}
+		else
+		{
+			while (count != index - 1) {
+				cur = cur->next;
+				count++;
+			}
+
+			Node *El = new Node(newElem, freq, cur->next);
+			cur->next->prev = El;
+			cur->next = El;
+
+		}
+		size++;
+	}
+}
+
+
+
+template<typename T>
+void List<T>::add_first(T newElem, size_t freq)
+{
+	head = new Node(newElem, freq);
+	tail = head;
+}
+
+template<typename T>
+void List<T>::sorting(Node* left, Node* right)
+{
+	if (left == right ) return;
+	Node *start = left;
+	Node *cur = left->next;
+	size_t frequancy;  //частота
+	T inf;
+	while (1)   //цикл для сортировки частот по возрастанию
+	{
+		if (start->freq >= cur->freq)
+		{
+			frequancy = cur->freq;
+			inf = cur->data;
+			cur->data = start->data;
+			cur->freq = start->freq;
+			start->freq = frequancy;
+			start->data = inf;
+		}
+		if (cur == right) break;
+		cur = cur->next;
+	}
+	frequancy = left->freq;
+	inf = left->data;
+	left->data = cur->data;
+	left->freq = cur->freq;
+	cur->data = inf;
+	cur->freq = frequancy;
+	Node *old_cur = cur;
+	//рекурсия
+	cur = cur->prev;
+	if (cur != nullptr)
+	{
+		if ((left->prev != cur) && (cur->next != left))
+			sorting(left, cur);
+	}
+	cur = old_cur;
+	cur = cur->next;
+	if (cur != nullptr)
+	{
+		if ((cur->prev != right) && (right->next != cur))
+			sorting(cur, right);
+
+	}
+}
+
+template<typename T>
+void List<T>::make_group(Node *first, Node *last)
+{
+		if (last == first) return; 
+		if (last->prev == first) // если 2 элемента
+		{ first->code += '0'; 
+		  last->code += '1';
+		}
+		else
+		{
+			Node* cur = first;
+			Node* merge = nullptr;
+			size_t sum = 0;
+			size_t check = counting_average_frequancy(first, last); //присваиваем среднее значение частот
+			while (cur != last->next) //пока не конец списка
+			{
+				
+				sum += cur->freq;
+				if (sum <= check || merge == nullptr) //делим пополам 0 и 1
+				{
+					cur->code += '0';
+					merge = cur;
+				}
+				else
+				{
+					cur->code += '1';
+			
+				}
+				cur = cur->next;
+			}
+			 //реккурсия на дальнейшее деление
+			make_group(first, merge);
+			make_group(merge->next, last);
+		}
+}
+
+template<typename T>
+bool List<T>::compare_str(string str, string code, int &size) //сравнение
+{
+	for (int i = 0; i < code.length(); i++)
+	{
+		size++;
+		if (code[i] != str[i]) return false;
+	}
+	return true;
+}
+
