@@ -3,101 +3,75 @@
 #include "Iterator.h"
 
 using namespace std;
-template <class  T>
-	
-class LinkedList {
-	public:	
-		class Node
-		{
-		public:
-			friend LinkedList<T>;
-
-			Node(T data, Node * next = nullptr, Node * prev = nullptr) {
-				this->data = data;
-				this->next = next;
-				this->prev = prev;
-			};
-
-			~Node()
-			{
-				next = nullptr;
-				delete next;
-				prev = nullptr;
-				delete prev;
-			};
-
-			T data;
-			Node* next;
-			Node* prev;
-		};
-
-		
-		Node * head;
-		Node * tail;
-		class ListIterator : public Iterator<T>
-		{
-		public:
-			ListIterator(Node* head)
-			{
-				current = head;
-			};
-
-		private:
-			T next() override;
-			bool has_next() override;
-			Node* current;
-		};
-		
-		Iterator<T>* create_list_iterator() const;
-		
-		
-
-
-		/*friend std::ostream& operator<<(std::ostream& os, const LinkedList<T>& linked_list) {
-			if (linked_list.size == 0)
-				return os << "[nullptr]";
-			auto * list = linked_list.create_list_iterator();
-			os << "[nullptr] <- ";
-			while (list->has_next()) {
-				os << "[" << list->next() << "] <- ";
-			}
-			os << "[nullptr]" << std::endl;
-			return os;
-		};*/
-
+template <typename T>
+class List
+{
+private:
+	void add_first(T newElem, size_t);
 
 	
-public:
-		LinkedList();
-		~LinkedList();
-		void push_back(T newElem);             // push in back of list
-		void push_front(T newElem);           // push in front of list
-		void insert(size_t index, T newElem); // adding element 
-		T at(size_t index) const;
-		void remove(size_t index);            // delete element 
-		size_t get_size() const;
-		void pop_back();                       // delete last element
-		void pop_front();                      // delete first element 
-		void print_to_console();              
-		void clear();                         // delete all list
-		void set(size_t index, T newElem) const; 
-		bool equals(LinkedList<T> * list);
-		void add_first(T newElem);             // adding first element
-		void reset_list();
-		size_t size;
-		bool isEmpty();
-		void swap(Node*, Node*);
-		void sortPart(int fromIndex, int toIndex, bool(*comp)(T, T));
-		void sort(bool (*comp)(T, T));
-		
-		friend std::ostream& operator<<(std::ostream& Out, const LinkedList<T>& list) {
-		
-			auto current = list.head;
-			while (current != NULL) {
-				Out << current->data << " ";
-				current = current->next;
-
-			}
-			return Out;
+	class Node
+	{
+	public:
+		Node(T data, size_t fr, Node * next = nullptr) {
+			this->data = data;
+			this->next = next;
+			this->prev = nullptr;
+			this->freq = fr;//частота
+			this->code = {};
 		}
+		//string get_code() { return code; };
+		T data;
+		size_t freq;
+		string code;
+		Node * prev;
+		Node * next;
 	};
+
+	Node * current;
+	Node * head;
+	Node * tail;
+	size_t size;
+	size_t counting_average_frequancy(Node*, Node*);
+	void set_code(Node*, Node*, char);
+public:
+	friend ostream& operator<< (ostream &out, List<T> &list)
+	{
+
+		auto cur = list.head;
+		while (cur != nullptr)
+		{
+			cout << cur->data << " ";
+			cur = cur->next;
+		}
+		return out;
+	}
+	;
+
+
+	List();
+	~List();
+
+	size_t get_size() const;
+	void push_back(T newElem, size_t);
+	void push_front(T newElem, size_t);
+	void pop_back();
+	void pop_front();
+	void print();
+	string get_code_list(size_t);
+	char get_data_list(size_t);
+	T at(size_t index) const;
+	Node* get_back() { return tail; };
+	Node* get_front() { return head; };
+	bool isEmpty();
+	void set(size_t index, T newElem);
+	void clear();
+	void Delete(size_t);
+	void insert(T, size_t, size_t);
+	void sorting(Node*, Node*);
+	void make_group(Node*, Node*);
+	bool compare_str(string, string, int&);
+	//string get_code() {};
+	//string get_data() {};
+
+};
